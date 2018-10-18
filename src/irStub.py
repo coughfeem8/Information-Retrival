@@ -1,10 +1,8 @@
 # Nigel Ward, UTEP, October 2018
 # Speech and Language Processing
 # Assignment E: Information Retrieval
-
 # This is just a skeleton that needs to be fleshed out.
 # It is not intended as an example of good Python style
-
 
 def parseAlternatingLinesFile(file):     #-----------------------------
    # read a sequence of pairs of lines, e.g. text of webpage(s), name/URL
@@ -139,16 +137,17 @@ def targetNumbers(targets, nameInventory):        # ----------------------
 import sys, numpy as np
 
 print('......... irStub .........')
-contents, names =  parseAlternatingLinesFile('csFaculty.txt') 
+contents, names =  parseAlternatingLinesFile('../res/csFaculty.txt') 
 print ('read in pages for ',)
 print (names)
 trigramInventory = pruneUniqueNgrams(findAllNgrams(contents))
 archive = [computeFeatures(line, trigramInventory) for line in contents]
+queryFile = '../res/'
 
 if len(sys.argv) >= 2 and (sys.argv[1] == 'yesThisReallyIsTheFinalRun'):
-    queryFile = 'testQueries.txt'
+    queryFile += 'testQueries.txt'
 else: 
-    queryFile = 'trainingQueries.txt'
+    queryFile += 'trainingQueries.txt'
 
 queries, targets = parseAlternatingLinesFile(queryFile)
 targetIDs = targetNumbers(targets, names)
