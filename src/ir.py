@@ -37,7 +37,7 @@ def retrieve(queries, unigramInventory, archive):      #------------------------
 def findAllNgrams(contents):          # ----------------------
     unigrams = {}
     for text in contents:
-        for uni in text:
+        for uni in text.split():
             if uni in unigrams:
                 unigrams[uni] += 1
             else:
@@ -98,7 +98,7 @@ def pruneUniqueNgrams(ngrams):        # ----------------------
 def computeFeatures(text, unigramInventory):        #-----------------------------
     # catches the similarities between  "social" and "societal" etc. 
     # but really should be replaced with something better
-    unigrams = text
+    unigrams = text.split()
     counts = {}
     for unigram in unigrams:
         if unigram in unigramInventory:
@@ -129,6 +129,7 @@ print ('read in pages for ',)
 print (names)
 unigramInventory = pruneUniqueNgrams(findAllNgrams(contents))
 archive = [computeFeatures(line, unigramInventory) for line in contents]
+print(archive)
 queryFile = '../res/'
 
 if len(sys.argv) >= 2 and (sys.argv[1] == 'yesThisReallyIsTheFinalRun'):
