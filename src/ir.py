@@ -33,6 +33,28 @@ def retrieve(queries, trigramInventory, archive):      #------------------------
         top3sets.append(top3indices)  
     return top3sets
 
+
+def findAllNgrams(contents):          # ----------------------
+    unigrams = {}
+    for text in contents:
+        for uni in text:
+            if uni in unigrams:
+                unigrams[uni] += 1
+            else:
+                unigrams[uni] = 1
+    return unigrams
+
+
+def targetNumbers(targets, nameInventory):        # ----------------------
+    # targets is a list of strings, each a sequence of names
+    targetIDs = []
+    for target in targets:
+      threeNumbers = [] 
+      for name in target.split():
+          threeNumbers.append(nameInventory.index(name))
+      targetIDs.append(threeNumbers)
+    return targetIDs
+ 
 def valueOfSuggestion(result, position, targets):   #-----------------------------
     weight = [1.0, .5, .25]
     if result in targets:
@@ -72,7 +94,7 @@ print('......... irStub .........')
 contents, names =  parseAlternatingLinesFile('../res/csFaculty.txt') 
 print ('read in pages for ',)
 print (names)
-trigramInventory = pruneUniqueNgrams(findAllNgrams(contents))
+UnigramInventory = pruneUniqueNgrams(findAllNgrams(contents))
 archive = [computeFeatures(line, trigramInventory) for line in contents]
 queryFile = '../res/'
 
@@ -83,6 +105,6 @@ else:
 
 queries, targets = parseAlternatingLinesFile(queryFile)
 targetIDs = targetNumbers(targets, names)
-results = retrieve(queries, trigramInventory, archive)
+results = retrieve(queries, unigramInventory, archive)
 modelName = 'silly character trigram model'
 scoreAllResults(queries, results, targetIDs, modelName + ' on ' + queryFile)
