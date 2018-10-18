@@ -86,6 +86,39 @@ def scoreAllResults(queries, results, targets, descriptor):   #-----------------
     print ('overall score is %.3f' % overallScore)
     return overallScore
     
+def pruneUniqueNgrams(ngrams):        # ----------------------
+    twoOrMore = {} 
+    print ('before pruning: %d ngrams across all documents' % len(ngrams))
+    for key in ngrams:
+        if ngrams[key] > 1:
+            twoOrMore[key] = ngrams[key]
+    print ('after pruning: %d ngrams across all documents' % len(twoOrMore))
+    return twoOrMore
+
+def computeFeatures(text, trigramInventory):        #-----------------------------
+    # catches the similarities between  "social" and "societal" etc. 
+    # but really should be replaced with something better
+    unigrams = text
+    counts = {}
+    for unigram in unigrams:
+        if unigram in trigramInventory:
+            if unigram in counts:
+                counts[unigram] += 1
+            else:
+                counts[unigram] = 1        
+
+    return counts
+
+def computeSimilarity(dict1, dict2):   #-----------------------------
+    # ad hoc and inefficient
+    matchCount = 0
+    for uni in dict1:
+        if uni in dict2:
+            #print "match on " + uni
+            matchCount += 1 
+    similarity = matchCount / float(len(dict2))
+    #print 'similarity %.3f' % similarity
+    return similarity
 
 # main ----------------------------------------------------
 import sys, numpy as np
@@ -94,8 +127,8 @@ print('......... irStub .........')
 contents, names =  parseAlternatingLinesFile('../res/csFaculty.txt') 
 print ('read in pages for ',)
 print (names)
-UnigramInventory = pruneUniqueNgrams(findAllNgrams(contents))
-archive = [computeFeatures(line, trigramInventory) for line in contents]
+unigramInventory = pruneUniqueNgrams(findAllNgrams(contents))
+archive = [computeFeatures(line, unigramInventory) for line in contents]
 queryFile = '../res/'
 
 if len(sys.argv) >= 2 and (sys.argv[1] == 'yesThisReallyIsTheFinalRun'):
