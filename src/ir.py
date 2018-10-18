@@ -15,12 +15,12 @@ def parseAlternatingLinesFile(file):     #-----------------------------
    fp.close()
    return sequenceA, sequenceB
 
-def retrieve(queries, trigramInventory, archive):      #-----------------------------
+def retrieve(queries, unigramInventory, archive):      #-----------------------------
     # returns an array: for each query, the top 3 results found
     top3sets = [] 
     for query in queries:
         #print 'query is ' + query
-        q = computeFeatures(query, trigramInventory)
+        q = computeFeatures(query, unigramInventory)
         #print 'query features are '
         #print q
         similarities = [] 
@@ -95,13 +95,13 @@ def pruneUniqueNgrams(ngrams):        # ----------------------
     print ('after pruning: %d ngrams across all documents' % len(twoOrMore))
     return twoOrMore
 
-def computeFeatures(text, trigramInventory):        #-----------------------------
+def computeFeatures(text, unigramInventory):        #-----------------------------
     # catches the similarities between  "social" and "societal" etc. 
     # but really should be replaced with something better
     unigrams = text
     counts = {}
     for unigram in unigrams:
-        if unigram in trigramInventory:
+        if unigram in unigramInventory:
             if unigram in counts:
                 counts[unigram] += 1
             else:
