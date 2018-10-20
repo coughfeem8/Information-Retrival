@@ -55,17 +55,17 @@ def retrieve(queries, trigramInventory, archive):      #------------------------
     # returns an array: for each query, the top 3 results found
     top3sets = [] 
     for query in queries:
-        #print 'query is ' + query
+        print ('query is ' + query)
         q = computeFeatures(query, trigramInventory)
-        #print 'query features are '
-        #print q
+        print ('query features are ')
+        print (q)
         similarities = [] 
         for d in archive:
             similarities.append(computeSimilarity(q, d))
-        #print similarities 
+        print (similarities )
         top3indices = np.argsort(similarities)[0:3]
-        #print "top three indices are "
-        #print top3indices
+        print ("top three indices are ")
+        print (top3indices)
         top3sets.append(top3indices)  
     return top3sets
 
