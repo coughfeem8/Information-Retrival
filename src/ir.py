@@ -103,7 +103,7 @@ def tfidf_retrieve(queries, unigrams, archive):
    return top3sets
 
 
-#------------------   Word2Vect  ---------------------------------------
+#------------------   Word2Vec  ---------------------------------------
 def wv_similarity(doc, query):
    '''retun the similarity of a document realted to the given query
       literaly  function 23.7'''
@@ -118,7 +118,7 @@ def wv_retrieve(queries, model, archive):
          q = [model.wv[word] for word in query.split()]
          #print( query)
       except KeyError:
-         #print('{} not found in webages'.format(query))
+         #print('{} not found in webpages'.format(query))
          continue
       similarities = []
       for d in archive:
@@ -129,7 +129,62 @@ def wv_retrieve(queries, model, archive):
       #print top3indices
       top3sets.append(top3indices)  
    return top3sets
+
+#---------- Naive  bayes  ---------------------------------
+def bayes(p_word, p_doc, likehood):
+   '''likehood = 
+      p_word = proability of word in the p_doc 
+      p_doc  = p_doc in the dataset'''
+   return likehood * p_word /p_doc
  
+def likehood_doc(bow,doc):
+   '''returns a list of the probability a word to apprear on a document.'''
+   doc_len = len(doc.split())
+   for word in bow:
+      bow[word] = bow.get(word) / float(doc_len) 
+   return bow
+
+def likehood_data(archive, data_size):
+   '''returns the probability of word to appear in the data set'''
+   for doc in archive:
+      for meh in doc:
+         for word  in meh:
+            archive[word] = archive.get(word) / float(data_size) 
+   return archive
+
+def bow_docs(text):
+    '''create a list of bag of words for every document.'''
+    bow_l  =[]
+    for doc in text:
+       bow = dict()
+       for word in doc.split():
+          if word  in bow:
+             bow[word] += 1
+          else:
+             bow[word] = 1
+       bow_l.append(bow)
+    return bow_l
+      
+def naive_retrieve(queries, bow_l, archive):
+   '''
+   queries = every querie given to the files
+   bow_l   = set of probability separated by page
+   archive = proability of every word in the sets
+   '''
+   top3sets = []
+   for i, query  in enumerate(queries):
+      try:
+         q =  [ bow_l[i][word] for word in query.split()]
+         print( query)
+      except KeyError:
+         print('{} not found in webages'.format(query))
+         continue
+      similarities = []
+      for d in bow_l:
+         # multiply the probability for every word in the query creates for every entry.
+         similarities.append(reduce((lambda x, y,: x*y),[bayes(uq,d,archive) for  uq in q ]))
+      top3sets = np.argsort(similarities)[0:3]
+   return top3sets
 
 #------------------   Unigram  ---------------------------------------
 def computeSimilarity(dict1, dict2):   #-----------------------------
@@ -209,6 +264,7 @@ def targetNumbers(targets, nameInventory):        # ----------------------
 import sys, numpy as np
 from  gensim.models import Word2Vec # used for generating the word vectors
 from collections import Counter
+from functools import reduce
 import copy
 
 print('......... irStub .........')
@@ -252,3 +308,15 @@ results = tfidf_retrieve(queries,unigramInventory,archive)
 modelName = 'tf-idf'
 scoreAllResults(queries, results, targetIDs, modelName + ' on ' + queryFile)
 
+
+#bayes
+print ('='*20+ "naive-bayes"+'='*20)
+bow_L = bow_docs(contents)
+bow_lik = [likehood_doc(bow, doc) for bow, doc, in zip(bow_L, contents)]
+
+contents_size = reduce((lambda x,y: x+y), [len(doc) for doc in contents])
+data_lik = likehood_data(archive, contents_size)
+
+results = naive_retrieve, (queries,bow_lik, data_lik)
+modelName = 'naive-bayes'
+scoreAllResults(queries, results, targetIDs, modelName + ' on ' + queryFile)
